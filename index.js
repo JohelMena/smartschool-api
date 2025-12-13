@@ -36,6 +36,18 @@ let students = [
   { id: "S2", fullName: "Jane Smith", grade: "7", guardianId: "G2", routeId: "R2" }
 ];
 
+let attendances = [
+ 
+  {
+     id: "A1",
+     studentId: "S1",
+     routeId: "R1",
+     busId: "B1",
+     date: "2025-12-13",
+     status: "present"   
+   }
+];
+
 // ===== Helpers =====
 const genId = prefix => prefix + Math.random().toString(16).slice(2, 8);
 
@@ -274,6 +286,59 @@ app.put("/students/:id", (req, res) => {
 });
 
 app.delete("/students/:id", deleteOne("students"));
+
+
+// ======================================================
+// ATTENDANCES
+// ======================================================
+
+app.get("/attendances", getAll(attendances));
+app.get("/attendances/:id", getOne(attendances));
+
+app.post("/attendances", (req, res) => {
+  const { studentId, routeId, busId, date, status } = req.body;
+
+  // Validaciones mínimas
+  if (!studentId || !date || !status) {
+    return res.status(400).json({
+      error: "studentId, date and status are required"
+    });
+  }
+
+  const attendance = {
+    id: genId("A"),
+    studentId,
+    routeId: routeId || "",
+    busId: busId || "",
+    date,               
+    status              
+  };
+
+  attendances.push(attendance);
+  res.status(201).json(attendance);
+});
+
+app.put("/attendances/:id", (req, res) => {
+  const index = attendances.findIndex(a => a.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: "Attendance not found" });
+  }
+
+  const { studentId, routeId, busId, date, status } = req.body;
+
+  attendances[index] = {
+    ...attendances[index],
+    studentId: studentId ?? attendances[index].studentId,
+    routeId: routeId ?? attendances[index].routeId,
+    busId: busId ?? attendances[index].busId,
+    date: date ?? attendances[index].date,
+    status: status ?? attendances[index].status
+  };
+
+  res.json(attendances[index]);
+});
+
+app.delete("/attendances/:id", deleteOne("attendances"));
 
 
 // ===== Start server =====
