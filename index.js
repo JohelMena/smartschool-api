@@ -298,6 +298,8 @@ app.get("/attendances/:id", getOne(attendances));
 app.post("/attendances", (req, res) => {
   const { studentId, routeId, busId, date, status } = req.body;
 
+  
+
   // Validaciones mínimas
   if (!studentId || !date || !status) {
     return res.status(400).json({
